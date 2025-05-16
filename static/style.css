@@ -1,0 +1,48 @@
+.media-container {
+    margin: 8px 0;
+    max-width: 100%;
+}
+
+.media-container img {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.media-container video {
+    max-width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.media-container audio {
+    width: 100%;
+    margin: 8px 0;
+}
+
+.media-caption {
+    margin-top: 4px;
+    font-size: 0.9em;
+    color: #666;
+}
+
+/* Стили для сообщений с медиа */
+.client .media-container {
+    margin-right: 8px;
+}
+
+.manager .media-container,
+.ai .media-container {
+    margin-left: 8px;
+}
+
+/* Адаптивные стили для медиа */
+@media (max-width: 768px) {
+    .media-container video {
+        max-width: 100%;
+    }
+    
+    .media-container img {
+        max-width: 100%;
+    }
+} 

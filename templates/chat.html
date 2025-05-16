@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ВАША КОМПАНИЯ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --tg-theme-bg-color: #1a1a1a;
+            --tg-theme-text-color: #ffffff;
+            --tg-theme-hint-color: #999999;
+            --tg-theme-link-color: #ff1493;
+            --tg-theme-button-color: #ff1493;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #2a2a2a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            transition: all 0.3s ease;
+        }
+
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            height: 100vh; 
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+        }
+
+        #messages { 
+            list-style-type: none; 
+            margin: 0; 
+            padding: 10px; 
+            overflow-y: auto; 
+            flex-grow: 1; 
+            background-color: var(--tg-theme-bg-color);
+            scroll-behavior: smooth;
+        }
+
+        #messages li { 
+            padding: 8px 12px; 
+            margin-bottom: 10px; 
+            border-radius: 7px; 
+            max-width: 85%;
+            word-wrap: break-word;
+            animation: messageAppear 0.3s ease-out;
+            position: relative;
+        }
+
+        @keyframes messageAppear {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #messages li.client { 
+            background-color: #ff1493; 
+            margin-left: auto; 
+            text-align: right;
+            border-bottom-right-radius: 0;
+        }
+
+        #messages li.manager { 
+            background-color: #d4126f; 
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+            border: 1px solid #ff1493;
+        }
+
+        #messages li.ai { 
+            background-color: var(--tg-theme-secondary-bg-color); 
+            margin-right: auto;
+            border-bottom-left-radius: 0;
+            border: 1px dashed #ff1493;
+        }
+
+        #messages li.system { 
+            background-color: rgba(255, 20, 147, 0.1); 
+            text-align: center; 
+            max-width: 90%; 
+            margin: 5px auto; 
+            font-style: italic; 
+            font-size: 0.9em;
+            color: var(--tg-theme-hint-color);
+        }
+
+        #messages li small { 
+            display: block; 
+            font-size: 0.7em; 
+            color: var(--tg-theme-hint-color); 
+            margin-top: 3px; 
+        }
+
+        #messages li.client small { 
+            color: rgba(255, 255, 255, 0.8); 
+        }
+
+        .media-container { 
+            margin: 5px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .media-container img { 
+            max-width: 100%; 
+            max-height: 300px; 
+            border-radius: 8px;
+            display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .media-container img:hover {
+            transform: scale(1.02);
+        }
+
+        .media-container video { 
+            max-width: 100%; 
+            max-height: 300px; 
+            border-radius: 8px;
+            display: block;
+        }
+
+        .media-container audio { 
+            width: 100%; 
+            border-radius: 20px;
+        }
+
+        .media-caption { 
+            font-size: 0.9em; 
+            color: var(--tg-theme-hint-color); 
+            margin-top: 5px; 
+            padding: 0 5px;
+        }
+
+        #form { 
+            display: flex; 
+            padding: 10px; 
+            background: var(--tg-theme-secondary-bg-color);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            align-items: center;
+        }
+
+        #keyboard-toggle {
+            background: var(--tg-theme-bg-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--tg-theme-text-color);
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+            display: none;
+            width: 40px;
+            height: 40px;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        #keyboard-toggle.visible {
+            display: flex;
+        }
+
+        #keyboard-toggle:hover {
+            background: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            transform: scale(1.1);
+        }
+
+        #keyboard-toggle.active {
+            background: #ff1493;
+            color: var(--tg-theme-button-text-color);
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.3);
+        }
+
+        #input { 
+            background: var(--tg-theme-bg-color);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 10px 15px; 
+            flex-grow: 1; 
+            border-radius: 20px; 
+            margin-right: 10px;
+            color: var(--tg-theme-text-color);
+            font-size: 15px;
+            outline: none;
+        }
+
+        #input:focus {
+            border-color: #ff1493;
+            box-shadow: 0 0 5px rgba(255, 20, 147, 0.3);
+        }
+
+        #input::placeholder {
+            color: var(--tg-theme-hint-color);
+        }
+
+        #form button { 
+            background: #ff1493; 
+            border: none; 
+            padding: 10px 15px; 
+            color: var(--tg-theme-button-text-color); 
+            border-radius: 20px; 
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        #form button:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.3);
+        }
+
+        #upload-btn { 
+            background: var(--tg-theme-bg-color) !important; 
+            border: 1px solid #ff1493 !important; 
+            padding: 10px 15px; 
+            color: #ff1493 !important; 
+            border-radius: 20px; 
+            cursor: pointer; 
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+
+        #upload-btn:hover {
+            background: #ff1493 !important;
+            color: var(--tg-theme-button-text-color) !important;
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.3);
+        }
+
+        #button-container { 
+            padding: 10px; 
+            text-align: center; 
+            background: var(--tg-theme-secondary-bg-color); 
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        #button-container button { 
+            margin: 5px; 
+            padding: 10px 20px; 
+            cursor: pointer; 
+            border-radius: 20px;
+            border: none;
+            background: #ff1493 !important;
+            color: var(--tg-theme-button-text-color);
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        #button-container button:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.3);
+        }
+
+        #new-chat-button-container { 
+            padding: 10px; 
+            text-align: center; 
+            background: var(--tg-theme-secondary-bg-color); 
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: none;
+        }
+
+        #new-chat-button-container button { 
+            padding: 10px 30px; 
+            cursor: pointer; 
+            background-color: #ff1493 !important; 
+            color: var(--tg-theme-button-text-color); 
+            border: none; 
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        #new-chat-button-container button:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(255, 20, 147, 0.3);
+        }
+
+        /* Анимация загрузки */
+        .loading {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            animation: loading 1.5s infinite;
+        }
+
+        @keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            #messages li {
+                max-width: 90%;
+            }
+
+            .media-container img,
+            .media-container video {
+                max-height: 250px;
+            }
+
+            #form {
+                padding: 8px;
+            }
+
+            #input {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            #form button,
+            #upload-btn {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #messages li {
+                max-width: 95%;
+                padding: 6px 10px;
+                font-size: 14px;
+            }
+
+            .media-container img,
+            .media-container video {
+                max-height: 200px;
+            }
+
+            #form {
+                padding: 6px;
+            }
+
+            #input {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+
+            #form button,
+            #upload-btn {
+                padding: 6px 10px;
+                font-size: 13px;
+            }
+        }
+
+        /* Стили для модального окна */
+        .media-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            overflow: auto;
+        }
+
+        .media-modal-content {
+            position: relative;
+            margin: auto;
+            padding: 20px;
+            width: 90%;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .media-modal-close {
+            position: absolute;
+            right: 20px;
+            top: 10px;
+            color: #fff;
+            font-size: 35px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .media-modal-close:hover {
+            color: #ff1493;
+        }
+
+        #modal-download {
+            display: block;
+            margin-top: 20px;
+            color: #ff1493;
+            text-decoration: none;
+            font-size: 16px;
+        }
+
+        #modal-download:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <ul id="messages"></ul>
+    <div id="button-container">
+        <button id="satisfied-btn" style="background-color: #ff1493;">👍 Я доволен ответом</button>
+        <button id="operator-btn" style="background-color: #ff1493;">🧑‍💼 Позвать оператора</button>
+    </div>
+    <div id="new-chat-button-container">
+        <button id="new-chat-btn">Начать новый чат</button>
+    </div>
+    <form id="form" action="">
+        <button type="button" id="keyboard-toggle" title="Скрыть клавиатуру">⌨️</button>
+        <input id="input" autocomplete="off" placeholder="Введите сообщение..." />
+        <input type="file" id="file-input" style="display: none;" />
+        <button type="button" id="upload-btn" title="Прикрепить файл">📎</button>
+        <button type="submit" style="background-color: #ff1493;">✈️</button>
+    </form>
+
+    <!-- Модальное окно для просмотра медиа -->
+    <div id="media-modal" class="media-modal">
+        <div class="media-modal-content">
+            <span class="media-modal-close">&times;</span>
+            <img id="modal-image" src="" alt="" style="max-width: 100%; max-height: 90vh;">
+            <video id="modal-video" controls style="max-width: 100%; max-height: 90vh; display: none;"></video>
+            <audio id="modal-audio" controls style="width: 100%; display: none;"></audio>
+            <a id="modal-download" href="" download rel="noopener" style="display: none;">Скачать файл</a>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+motor==3.3.1
+pymongo==4.5.0
+python-dotenv==1.0.1
+aiogram>=3.0.0
+loguru
+requests
+openai
+python-multipart==0.0.20
+minio==7.2.3
